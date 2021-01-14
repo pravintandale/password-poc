@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'core',
     'user',
@@ -104,6 +105,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework.authentication.BasicAuthentication',)
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
@@ -124,3 +129,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = "core.User"
+
+CORS_ALLOW_HEADERS = (('x-django-sleep', ) if DEBUG else ()) + (  # noqa
+        'accept', 'accept-encoding', 'authorization',
+        'content-type', 'dnt', 'origin', 'user-agent',
+        'x-csrftoken', 'x-requested-with',
+    )
