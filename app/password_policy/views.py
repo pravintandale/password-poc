@@ -8,3 +8,6 @@ class passwordPolicyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     queryset = PasswordPolicy.objects.all()
     serializer_class = serializers.PasswordPolicySerializer
 
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user).order_by('-name')
+

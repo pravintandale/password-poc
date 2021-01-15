@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from password_policy import views
 
 router = DefaultRouter()
-router.register('password_policy', views.passwordPolicyViewSet)
+router.register('', views.passwordPolicyViewSet)
 
 app_name = 'password_policy'
 
