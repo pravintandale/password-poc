@@ -15,6 +15,8 @@ class passwordPolicyViewSet(viewsets.ModelViewSet):
             return self.queryset
         return self.queryset.filter(user=self.request.user)
 
+    def perform_create(self, serializer):
+        """create new password policy"""
         if serializer.validated_data.get('status'):
             PasswordPolicy.objects.filter(user=self.request.user).update(status=False)
         serializer.save(user=self.request.user)
@@ -24,4 +26,3 @@ class passwordPolicyViewSet(viewsets.ModelViewSet):
         if serializer.validated_data.get('status'):
             PasswordPolicy.objects.filter(user=self.request.user).update(status=False)
         serializer.save()
-
