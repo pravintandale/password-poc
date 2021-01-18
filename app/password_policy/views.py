@@ -3,12 +3,7 @@ from core.models import PasswordPolicy
 from password_policy import serializers
 from user import permissions
 
-class passwordPolicyViewSet(viewsets.GenericViewSet,
-                            mixins.ListModelMixin,
-                            mixins.CreateModelMixin,
-                            mixins.RetrieveModelMixin,
-                            mixins.UpdateModelMixin,
-                            mixins.DestroyModelMixin):
+class passwordPolicyViewSet(viewsets.ModelViewSet):
     """manage password policy database"""
 
     queryset = PasswordPolicy.objects.all()
@@ -22,4 +17,13 @@ class passwordPolicyViewSet(viewsets.GenericViewSet,
 
     def perform_create(self, serializer):
         """create new password policy"""
+        if serializer.validated_data.get('status'):
+            PasswordPolicy.objects.filter(user=self.request.user).update(status=False)
         serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        """update password policy"""
+        if serializer.validated_data.get('status'):
+            PasswordPolicy.objects.filter(user=self.request.user).update(status=False)
+        serializer.save()
+
