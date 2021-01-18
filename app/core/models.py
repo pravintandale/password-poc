@@ -1,8 +1,12 @@
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import (AbstractBaseUser,
                                         BaseUserManager,
                                         PermissionsMixin)
 from django.conf import settings
+from pycountry import countries
+
+COUNTRY_CHOICES = tuple((country.name, country.name) for country in countries)
 
 
 class UserManager(BaseUserManager):
@@ -31,8 +35,14 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     """custom user model"""
 
-    email = models.EmailField(max_length=255, unique=True)
-    name = models.CharField(max_length=255, null=True, blank=True)
+    email = models.EmailField(_('Email'), max_length=255, unique=True)
+    first_name = models.CharField(_('First Name'), max_length=255, null=True, blank=True)
+    last_name = models.CharField(_('Last Name'), max_length=255, null=True, blank=True)
+    company_name = models.CharField(_('Company Name'), max_length=255, null=True, blank=True)
+    country = models.CharField(_('Country'), max_length=50, choices=COUNTRY_CHOICES, null=True, blank=True)
+    require_password_change = models.BooleanField(_('Require password change'), default=False)
+    preferred_language = models.CharField(_('Preferred language'), max_length=50, default='English')
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
