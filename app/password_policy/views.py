@@ -1,6 +1,7 @@
 from rest_framework import viewsets, mixins
 from core.models import PasswordPolicy
 from password_policy import serializers
+from user import permissions
 
 class passwordPolicyViewSet(viewsets.GenericViewSet,
                             mixins.ListModelMixin,
@@ -12,6 +13,7 @@ class passwordPolicyViewSet(viewsets.GenericViewSet,
 
     queryset = PasswordPolicy.objects.all()
     serializer_class = serializers.PasswordPolicySerializer
+    permission_classes = [permissions.UserPermission, ]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
