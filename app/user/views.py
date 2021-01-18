@@ -2,6 +2,8 @@ from django.contrib.auth import login, authenticate
 from rest_framework import views, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 
 from user import serializers, permissions
 from core.models import User
@@ -24,16 +26,17 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class LoginView(views.APIView):
+class LoginView(ObtainAuthToken):
     """Login view"""
 
     def post(self, request, format=None):
-        serializer = serializers.UserLoginSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        if user.is_active:
-            login(request, user)
-            return Response(data={"message": "login success"},
-                            status=status.HTTP_200_OK)
-        return Response(data={'message': 'Your account is currently deactivated.'},
-                        status=status.HTTP_400_BAD_REQUEST)
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email
+        })
