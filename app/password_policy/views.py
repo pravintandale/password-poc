@@ -1,13 +1,25 @@
 from rest_framework import viewsets, mixins
 from core.models import PasswordPolicy
 from password_policy import serializers
+from user import permissions
 
-class passwordPolicyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+class passwordPolicyViewSet(viewsets.GenericViewSet,
+                            mixins.ListModelMixin,
+                            mixins.CreateModelMixin,
+                            mixins.RetrieveModelMixin,
+                            mixins.UpdateModelMixin,
+                            mixins.DestroyModelMixin):
     """manage password policy database"""
 
     queryset = PasswordPolicy.objects.all()
     serializer_class = serializers.PasswordPolicySerializer
+    permission_classes = [permissions.UserPermission, ]
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user).order_by('-name')
+        if self.request.user.is_superuser:
+            return self.queryset
+        return self.queryset.filter(user=self.request.user)
 
+    def perform_create(self, serializer):
+        """create new password policy"""
+        serializer.save(user=self.request.user)

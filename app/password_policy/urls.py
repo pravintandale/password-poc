@@ -6,7 +6,6 @@ from password_policy import views
 router = DefaultRouter()
 router.register('', views.passwordPolicyViewSet)
 
-app_name = 'password_policy'
 
 urlpatterns = [
     path('', include(router.urls))
