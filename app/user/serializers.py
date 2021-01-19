@@ -29,7 +29,8 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
         return user
 
-    def validate(self, data):
+    # as discuss with UI team don't validate in BE.
+    def validate__pass(self, data):
         user = User(**data)
         password = data.get('password')
         errors = dict()
