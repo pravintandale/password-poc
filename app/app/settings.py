@@ -25,7 +25,7 @@ SECRET_KEY = '@+35-pgk_1&0huhii3(pzyj2(6kc)b(61@a_xsjv)fvzssp_vg'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -140,3 +140,7 @@ CORS_ALLOW_HEADERS = (('x-django-sleep', ) if DEBUG else ()) + (  # noqa
         'content-type', 'dnt', 'origin', 'user-agent',
         'x-csrftoken', 'x-requested-with',
     )
+
+REST_FRAMEWORK = {
+    'DATETIME_FORMAT': "%m/%d/%Y %H:%M:%S",
+}
