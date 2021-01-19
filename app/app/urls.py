@@ -50,5 +50,6 @@ urlpatterns = [
     path('api/login/', views.LoginView.as_view(), name='login'),
     path('api/user/', include(ROUTER.urls)),
     path('api/password_policy/', include('password_policy.urls')),
+    path('api/change-password/', views.ChangePasswordView.as_view(), name='change_password'),
 
 ]
