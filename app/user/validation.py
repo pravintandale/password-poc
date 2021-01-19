@@ -50,7 +50,7 @@ class UserAttributeSimilarityValidator:
 class MinimumNumberValidator:
     """Validator for chacking munimum numbers """
 
-    def __init__(self, min_number=1):
+    def __init__(self, min_number=0):
         self.min_number = min_number
 
     def count_number(self, password):
@@ -82,7 +82,7 @@ class MinimumNumberValidator:
 class MinimumLowerCaseValidator:
     """Validator for checking minimum lower char"""
 
-    def __init__(self, min_lower=1):
+    def __init__(self, min_lower=0):
         self.min_lower = min_lower
 
     def count_lower(self, password):
@@ -114,7 +114,7 @@ class MinimumLowerCaseValidator:
 class MinimumUpperCaseValidator:
     """Validator for checking minimum upper char"""
 
-    def __init__(self, min_upper=1):
+    def __init__(self, min_upper=0):
         self.min_upper = min_upper
 
     def count_upper(self, password):
