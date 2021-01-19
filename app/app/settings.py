@@ -127,7 +127,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework.authentication.BasicAuthentication',
-                                       'rest_framework.authentication.TokenAuthentication')
+                                       'rest_framework.authentication.TokenAuthentication'),
+    'DATETIME_FORMAT': "%m/%d/%Y %H:%M:%S",
 }
 
 # Internationalization
@@ -158,7 +159,3 @@ CORS_ALLOW_HEADERS = (('x-django-sleep', ) if DEBUG else ()) + (  # noqa
         'content-type', 'dnt', 'origin', 'user-agent',
         'x-csrftoken', 'x-requested-with',
     )
-
-REST_FRAMEWORK = {
-    'DATETIME_FORMAT': "%m/%d/%Y %H:%M:%S",
-}
