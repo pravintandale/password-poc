@@ -3,6 +3,7 @@ from core.models import PasswordPolicy
 from password_policy import serializers
 from . import permissions
 
+
 class passwordPolicyViewSet(viewsets.ModelViewSet):
     """manage password policy database"""
 
