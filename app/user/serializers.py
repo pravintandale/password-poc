@@ -12,6 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ('id', 'email', 'password', 'first_name', 'last_name', 'company_name',
                   'country', 'require_password_change', 'preferred_language')
+        read_only_fields = ('id', )
         extra_kwargs = {
             'password': {"style": {"input_type": "password"}, "write_only": True, }
         }
@@ -29,24 +30,82 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
         return user
 
-    # as discuss with UI team don't validate in BE.
-    def validate__pass(self, data):
-        user = User(**data)
-        password = data.get('password')
+    def validate_password(self, password):
         errors = dict()
         try:
-            password_validation.validate_password(password=password, user=user)
+            password_validation.validate_password(password=password)
         except exceptions.ValidationError as e:
             errors['password'] = list(e.messages)
         if errors:
             raise serializers.ValidationError(errors)
-        return super().validate(data)
+        return password
+
 
 class ChangePasswordSerializer(serializers.Serializer):
-    model = User
-
     """
     Serializer for password change endpoint.
     """
+
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+
+    class Meta:
+        model = get_user_model()
+
+    def validate_new_password(self, password):
+        errors = dict()
+        try:
+            current_policy = self.context.get('user').password_policy.get(status=True)
+            new_validators = [
+                {
+                    'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+                    'OPTIONS': {'min_length': current_policy.min_length}
+                },
+                {
+                    'NAME': 'user.validation.MinimumLowerCaseValidator',
+                    'OPTIONS': {'min_lower': current_policy.min_lowercase}
+                },
+                {
+                    'NAME': 'user.validation.MinimumUpperCaseValidator',
+                    'OPTIONS': {'min_upper': current_policy.min_uppercase}
+                },
+                {
+                    'NAME': 'user.validation.MinimumNumberValidator',
+                    'OPTIONS': {'min_number': current_policy.min_number}
+                },
+                {
+                    'NAME': 'user.validation.MinimumSpecialValidator',
+                    'OPTIONS': {'min_special': current_policy.min_special_char}
+                },
+                {
+                    'NAME': 'user.validation.MinimumDifferentValidator',
+                    'OPTIONS': {'min_diff': current_policy.min_different_char}
+                },
+                {
+                    'NAME': 'user.validation.UserAttributeSimilarityValidator',
+                }
+                # {
+                #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+                # }
+            ]
+            if current_policy.max_consecutive_char:
+                new_validators.append(
+                    {
+                        'NAME': 'user.validation.MaximumRepeatingValidator',
+                        'OPTIONS': {'max_repeating': current_policy.max_consecutive_char}
+                    }
+                )
+            if current_policy.max_consecutive_char_type:
+                new_validators.append(
+                    {
+                        'NAME': 'user.validation.MaximumRepeatingTypeValidator',
+                        'OPTIONS': {'max_repeating': current_policy.max_consecutive_char_type}
+                    }
+                )
+            password_validation.validate_password(
+                password=password,
+                password_validators=password_validation.get_password_validators(new_validators)
+            )
+        except exceptions.ValidationError as e:
+            raise serializers.ValidationError(list(e.messages))
+        return password

@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 
 from user import serializers, permissions
-from core.models import User
+from core.models import User, PasswordPolicy
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -26,6 +26,18 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer_class()(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def get_serializer_context(self):
+        """Extra context provided to the serializer class."""
+        return {
+            'view': self,
+            'user': self.request.user
+        }
+
+    def perform_create(self, serializer):
+        """Create user default policy"""
+        user = serializer.save()
+        PasswordPolicy.objects.create(name='Default', min_length=8, status=True, user=user)
+
 
 class LoginView(ObtainAuthToken):
     """Login view"""
@@ -42,6 +54,7 @@ class LoginView(ObtainAuthToken):
             'email': user.email
         })
 
+
 class ChangePasswordView(generics.UpdateAPIView):
     """
     An endpoint for changing password.
@@ -51,17 +64,19 @@ class ChangePasswordView(generics.UpdateAPIView):
     permission_classes = (IsAuthenticated, )
 
     def get_object(self, queryset=None):
-        obj = self.request.user
-        return obj
+        return self.request.user
 
     def update(self, request, *args, **kwargs):
         self.object = self.get_object()
+
+        # Check old password
+        if not self.object.check_password(request.data.get("old_password")):
+            return Response({"old_password": ["Wrong password."]},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
-            # Check old password
-            if not self.object.check_password(serializer.data.get("old_password")):
-                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
             # set_password also hashes the password that the user will get
             self.object.set_password(serializer.data.get("new_password"))
             self.object.save()
@@ -71,8 +86,12 @@ class ChangePasswordView(generics.UpdateAPIView):
                 'message': 'Password updated successfully',
                 'data': []
             }
-
             return Response(response)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def get_serializer_context(self):
+        """Extra context provided to the serializer class."""
+        return {
+            'view': self,
+            'user': self.request.user
+        }

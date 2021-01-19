@@ -55,23 +55,21 @@ class PasswordPolicy(models.Model):
     """password policy model"""
 
     name = models.CharField(max_length=255, unique=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='password_policy')
+    min_number = models.IntegerField(default=0)
     min_length = models.IntegerField(default=8)
-    #min_characters = models.IntegerField()
-    #min_lowercase = models.IntegerField()
-    #min_uppercase = models.IntegerField()
-    #min_special_char = models.IntegerField()
-    #min_different_char = models.IntegerField()
-    #max_consecutive_char = models.IntegerField()
-    #max_consecutive_char_type = models.IntegerField()
+    min_lowercase = models.IntegerField(default=0)
+    min_uppercase = models.IntegerField(default=0)
+    min_special_char = models.IntegerField(default=0)
+    min_different_char = models.IntegerField(default=0)
+    max_consecutive_char = models.IntegerField(default=0)
+    max_consecutive_char_type = models.IntegerField(default=0)
     exp_interval = models.IntegerField(default=90)
-    #warn_interval = models.IntegerField()
+    warn_interval = models.IntegerField(default=10)
     pwd_history = models.IntegerField(default=7)
-    is_alpha_numeric = models.BooleanField(default=True)
     contains_username = models.BooleanField(default=False)
-    must_mixed = models.BooleanField(default=False)
     status = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return "{} - {}".format(self.user, self.name)
