@@ -75,15 +75,26 @@ class ChangePasswordView(generics.UpdateAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.get_serializer(data=request.data)
+        # Chek policy id belongs to user
+        try:
+
+            PasswordPolicy.objects.get(user=self.request.user, id=request.data.get('policy_id'))
+        except PasswordPolicy.DoesNotExist:
+            return Response({'ploicy_id': 'Does not belong to you.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if serializer.is_valid():
             # set_password also hashes the password that the user will get
             self.object.set_password(serializer.data.get("new_password"))
             self.object.save()
+
+            # Set active policy.
+            PasswordPolicy.objects.filter(user=self.request.user, status=True).update(status=False)
+            PasswordPolicy.objects.filter(user=self.request.user, id=request.data.get('policy_id')).update(status=True)
+            Token.objects.filter(user=self.request.user).delete()
             response = {
                 'status': 'success',
                 'code': status.HTTP_200_OK,
-                'message': 'Password updated successfully',
+                'message': 'Password updated successfully, please login again.',
                 'data': []
             }
             return Response(response)
@@ -93,5 +104,6 @@ class ChangePasswordView(generics.UpdateAPIView):
         """Extra context provided to the serializer class."""
         return {
             'view': self,
-            'user': self.request.user
+            'user': self.request.user,
+            'policy_id': self.request.data.get('policy_id')
         }

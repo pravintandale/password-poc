@@ -46,14 +46,16 @@ class ChangePasswordSerializer(serializers.Serializer):
 
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+    policy_id = serializers.CharField(required=True)
 
     class Meta:
         model = get_user_model()
+        fields = ('old_password', 'new_password', 'policy_id')
 
     def validate_new_password(self, password):
         errors = dict()
         try:
-            current_policy = self.context.get('user').password_policy.get(status=True)
+            current_policy = self.context.get('user').password_policy.get(id=self.context.get('policy_id'))
             new_validators = [
                 {
                     'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
