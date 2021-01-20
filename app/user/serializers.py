@@ -35,9 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
         try:
             password_validation.validate_password(password=password)
         except exceptions.ValidationError as e:
-            errors['password'] = list(e.messages)
-        if errors:
-            raise serializers.ValidationError(errors)
+            raise serializers.ValidationError(list(e.messages))
         return password
 
 
