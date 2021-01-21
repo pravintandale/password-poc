@@ -232,8 +232,7 @@ class MaximumRepeatingValidator:
         return count
 
     def validate(self, password, user=None):
-        c = self.count_repeating(password)
-        if c and self.max_repeating and c > self.max_repeating:
+        if self.max_repeating and self.count_repeating(password) > self.max_repeating:
             raise ValidationError(
                 ngettext(
                     "This password must not contain more than %(max_repeating)d repeating character.",
@@ -280,8 +279,7 @@ class MaximumRepeatingTypeValidator:
         return count
 
     def validate(self, password, user=None):
-        c = self.count_repeating(password)
-        if c and self.max_repeating and c > self.max_repeating:
+        if self.max_repeating and self.count_repeating(password) > self.max_repeating:
             raise ValidationError(
                 ngettext(
                     "This password must not contain more than %(max_repeating)d repeating type character.",
