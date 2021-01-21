@@ -9,6 +9,6 @@ class PasswordPolicyPermission(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        if request.user.is_authenticated and view.action != 'destroy':
+        if request.user.is_authenticated:
             return True
         return False
