@@ -214,7 +214,7 @@ class MinimumDifferentValidator:
 class MaximumRepeatingValidator:
     """Validator for checking maximum reapeating char"""
 
-    def __init__(self, max_repeating=5):
+    def __init__(self, max_repeating=0):
         self.max_repeating = max_repeating
 
     def count_repeating(self, password):
@@ -232,7 +232,8 @@ class MaximumRepeatingValidator:
         return count
 
     def validate(self, password, user=None):
-        if self.count_repeating(password) > self.max_repeating:
+        c = self.count_repeating(password)
+        if c and self.max_repeating and c > self.max_repeating:
             raise ValidationError(
                 ngettext(
                     "This password must not contain more than %(max_repeating)d repeating character.",
@@ -254,7 +255,7 @@ class MaximumRepeatingValidator:
 class MaximumRepeatingTypeValidator:
     """Validator for checking maximum reapeating type char"""
 
-    def __init__(self, max_repeating=5):
+    def __init__(self, max_repeating=0):
         self.max_repeating = max_repeating
 
     def find_type(self, ch):
@@ -279,7 +280,8 @@ class MaximumRepeatingTypeValidator:
         return count
 
     def validate(self, password, user=None):
-        if self.count_repeating(password) > self.max_repeating:
+        c = self.count_repeating(password)
+        if c and self.max_repeating and c > self.max_repeating:
             raise ValidationError(
                 ngettext(
                     "This password must not contain more than %(max_repeating)d repeating type character.",
