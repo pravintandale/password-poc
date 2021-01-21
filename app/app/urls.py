@@ -30,11 +30,11 @@ ROUTER.register(r'', views.UserViewSet, basename='user')
 
 SchemaView = get_schema_view(
     openapi.Info(
-        title="Snippets API",
+        title="Password API",
         default_version='v1',
-        description="Test description",
+        description="User can set own password policy.",
         terms_of_service="https://www.google.com/policies/terms/",
-        contact=openapi.Contact(email="Pravin.Tandale@xoriant.com"),
+        contact=openapi.Contact(email="Pravin.Tandale@Xoriant.com"),
         license=openapi.License(name="BSD License"),
     ),
     public=True,
@@ -42,10 +42,10 @@ SchemaView = get_schema_view(
 )
 
 urlpatterns = [
-    re_path(r'^swagger(?P<format>.json|.yaml)$', SchemaView.without_ui(cache_timeout=0), name='schema-json'),
-    path('swagger/', SchemaView.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    # re_path(r'^swagger(?P<format>.json|.yaml)$', SchemaView.without_ui(cache_timeout=0), name='schema-json'),
+    # path('swagger/', SchemaView.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', SchemaView.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('redoc-old/', SchemaView.with_ui('redoc-old', cache_timeout=0), name='schema-redoc-old'),
+    # path('redoc-old/', SchemaView.with_ui('redoc-old', cache_timeout=0), name='schema-redoc-old'),
     path('admin/', admin.site.urls),
     path('api/login/', views.LoginView.as_view(), name='login'),
     path('api/user/', include(ROUTER.urls)),
